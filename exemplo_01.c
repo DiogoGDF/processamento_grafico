@@ -168,7 +168,6 @@ int main () {
     // Define shader_programme como o shader a ser utilizado
     glUseProgram (shader_programm);
 
-    // Define vao como verte array atual 
     glBindVertexArray (vao);
     // 5.4.1 - Este comando dispara a execução do pipeline na GPU
     // desenha pontos a partir do vértice 0 até 6
