@@ -129,7 +129,7 @@ int main() {
         
         int screenWidth, screenHeight;
         glfwGetWindowSize(window, &screenWidth, &screenHeight);
-        glViewport(0, 0, screenWidth, screenHeight);
+        glViewport(0, 0, 1600, 1200);
         
         // PASSAGEM DE PARÂMETROS PRA SHADERS
         glUseProgram (shader_programme);
