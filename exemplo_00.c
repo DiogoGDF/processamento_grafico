@@ -106,7 +106,7 @@ int main()
 
     // 5.3 - Shaders
     // 5.3.1 - Vertex shader
-    // Definição de um shader de vértices como uma String. O shader de vértices é responsável por transformar os vértices de um objeto 3D em coordenadas 2D e também por passar as cores dos vértices para o shader de fragmentos. 
+    // O shader de vértices é responsável por transformar os vértices de um objeto 3D em coordenadas 2D e também por passar as cores dos vértices para o shader de fragmentos. 
     const char* vertex_shader =
         "#version 400\n"
         // layout(location=0) indica que o atributo de vértice está no layout 0. in vec3 vp; indica que o atributo de vértice é um vec3 (vetor de 3 floats) chamado vp.
@@ -125,11 +125,11 @@ int main()
     ;
 
     // 5.3.2 - Fragment shader
-    // Definição de um shader de fragmentos como uma String. O shader de fragmentos é responsável por calcular a cor de cada pixel na tela.
+    // O shader de fragmentos é responsável por calcular a cor de cada pixel na tela.
     const char* fragment_shader =
         // versão do shader
         "#version 400\n"
-        // indica que a cor do vértice é passada para o shader de fragmentos.
+        // indica que a entrada da cor do vértice.
         "in vec3 color;"
         // indica que a cor do fragmento é um vec4 (vetor de 4 floats) chamado frag_color.
         "out vec4 frag_color;"

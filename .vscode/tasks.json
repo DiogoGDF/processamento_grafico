@@ -14,7 +14,7 @@
                 "IOKit",
                 "-o",
                 "${workspaceFolder}/exemplo",
-                "${workspaceFolder}/exemplo_02.cpp",
+                "${file}",
                 "-I include",
                 "-I${workspaceFolder}/dependencies/include",
                 "-L${workspaceFolder}/dependencies/library",
