@@ -5,6 +5,13 @@
 //STB IMAGE
 #include <stb_image.h>
 
+// soundtrack
+#include <Windows.h>
+#include <mmsystem.h>
+#include <string>
+
+#pragma comment(lib, "winmm.lib")
+
 using namespace std;
 
 //Classe para manipulação dos shaders
@@ -28,6 +35,9 @@ Sprite spr;
 // Função MAIN
 int main()
 {
+	// soundtrack
+	PlaySound(TEXT("../../Soundtrack/end_of_line.wav"), NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
+
 	// Inicialização da GLFW
 	glfwInit();
 
