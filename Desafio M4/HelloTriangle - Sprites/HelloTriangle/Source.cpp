@@ -72,24 +72,29 @@ int main()
 	GLuint texID1 = loadTexture("../../Textures/backgrounds/PNG/Cybercity2/Night/1.png");
 	GLuint texID2 = loadTexture("../../Textures/characters/PNG/Biker/Biker_idle.png");
 	GLuint texID3 = loadTexture("../../Textures/backgrounds/PNG/Cybercity2/Night/3.png");
-	GLuint texID5 = loadTexture("../../Textures/backgrounds/PNG/Cybercity2/Frames/Frame_47.png");
+	GLuint texID5 = loadTexture("../../Textures/backgrounds/PNG/Cybercity2/Tiles/Tile_26.png");
+	GLuint texID6 = loadTexture("../../Textures/backgrounds/PNG/Cybercity2/Tiles/Tile_37.png");
 
 	//Criação de uma sprite
 
 	spr.setShader(&shader);
-	spr.inicializar(texID2, glm::vec3(400.0, 90.0, 0.0), glm::vec3(128.0, 128.0, 1.0), 0.0, 1.0, 0.25);
+	spr.inicializar(texID2, glm::vec3(400.0, 100.0, 0.0), glm::vec3(100.0, 100.0, 1.0), 0.0, 1.0, 0.25);
 	
 	Sprite background;
 	background.setShader(&shader);
-	background.inicializar(texID1, glm::vec3(400.0, 300.0, 0.0), glm::vec3(1920.0/2.0, 1080.0/2.0, 1.0), 0.0, 1.0, 1.0);
+	background.inicializar(texID1, glm::vec3(400.0, 320.0, 0.0), glm::vec3(1920.0/2.0, 1080.0/2.0, 1.0), 0.0, 1.0, 1.0);
 
 	Sprite background2;
 	background2.setShader(&shader);
-	background2.inicializar(texID3, glm::vec3(400.0, 290.0, 0.0), glm::vec3(1920.0/2.0, 1080.0/2.0, 1.0), 0.0, 1.0, 1.0);
+	background2.inicializar(texID3, glm::vec3(400.0, 310.0, 0.0), glm::vec3(1920.0/2.0, 1080.0/2.0, 1.0), 0.0, 1.0, 1.0);
 
 	Sprite chao;
 	chao.setShader(&shader);
-	chao.inicializar(texID5, glm::vec3(400.0, 15.0, 0.0), glm::vec3(1920.0/2.0, 32.0, 1.0), 0.0, 1.0, 1920.0/2.0);
+	chao.inicializar(texID5, glm::vec3(400.0, 35.0, 0.0), glm::vec3(1920.0/2.0, 32.0, 1.0), 0.0, 1.0, 30.0);
+
+	Sprite chao2;
+	chao2.setShader(&shader);
+	chao2.inicializar(texID6, glm::vec3(400.0, 1.0, 0.0), glm::vec3(1920.0/2.0, 32.0, 1.0), 0.0, 1.0, 30.0);
 
 	//Ativando o buffer de textura 0 da opengl
 	glActiveTexture(GL_TEXTURE0);
@@ -121,6 +126,7 @@ int main()
 
 		background.desenhar();
 		background2.desenhar();
+		chao2.desenhar();
 		chao.desenhar();
 		
 		spr.desenhar();
