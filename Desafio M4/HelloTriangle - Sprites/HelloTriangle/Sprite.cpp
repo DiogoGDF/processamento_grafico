@@ -6,27 +6,33 @@ Sprite::~Sprite()
 	glDeleteVertexArrays(1, &VAO);
 }
 
-void Sprite::inicializar(GLuint texID, glm::vec3 pos, glm::vec3 escala, float angulo)
+void Sprite::inicializar(GLuint texID, glm::vec3 pos, glm::vec3 escala, float angulo, float altura, float largura)
 {
 	this->texID = texID;
 	this->pos = pos;
 	this->escala = escala;
 	this->angulo = angulo;
+	this->altura = altura;
+	this->largura = largura;
+
+	cout << "Altura: " << altura << " Largura: " << largura << endl;
 
 	GLfloat vertices[] = {
 		//Triangulo 0
 		//x     y    z		r    g    b			s    t
-		-0.5 , 0.5, 0.0,	1.0, 0.0, 0.0,		0.0, 1.0,  //v0
+		-0.5 , 0.5, 0.0,	1.0, 0.0, 0.0,		0.0, altura,  //v0
 		-0.5 ,-0.5, 0.0,	1.0, 0.0, 0.0,		0.0, 0.0,  //v1
-		 0.5 , 0.5, 0.0,	1.0, 0.0, 0.0,		1.0, 1.0,  //v2
+		 0.5 , 0.5, 0.0,	1.0, 0.0, 0.0,		largura, altura,  //v2
 
 		 //Triangulo 1	
 	    -0.5 ,-0.5, 0.0,	1.0, 0.0, 0.0,		0.0, 0.0,  //v1
-		 0.5 ,-0.5, 0.0,	1.0, 0.0, 0.0,		1.0, 0.0,  //v3
-		 0.5 , 0.5, 0.0,	1.0, 0.0, 0.0,		1.0, 1.0   //v2
+		 0.5 ,-0.5, 0.0,	1.0, 0.0, 0.0,		largura, 0.0,  //v3
+		 0.5 , 0.5, 0.0,	1.0, 0.0, 0.0,		largura, altura //v2
 		
 	};
 	
+	// tileset e tilemap
+	// mapeamento de textura
 
 	GLuint VBO;
 	//Geração do identificador do VBO
