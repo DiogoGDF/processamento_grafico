@@ -89,7 +89,7 @@ int main()
 	//Criação de uma sprite
 
 	spr.setShader(&shader);
-	spr.inicializar(texID2, glm::vec3(400.0, 83.0, 0.0), glm::vec3(imgWidth*2, imgHeight*2, 1.0), 0.0, 1.0, 0.25, 1.0, 1.0);
+	spr.inicializar(texID2, glm::vec3(400.0, 83.0, 0.0), glm::vec3(imgWidth*2, imgHeight*2, 1.0), 0.0, 1.0, 1.0, 4.0, 1.0);
 	
 	Sprite background;
 	background.setShader(&shader);

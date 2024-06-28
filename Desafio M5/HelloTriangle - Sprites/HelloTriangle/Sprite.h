@@ -7,7 +7,7 @@ class Sprite
 public:
 	Sprite() {}
 	~Sprite();
-	void inicializar(GLuint texID,glm::vec3 pos = glm::vec3(0.0,0.0,0.0), glm::vec3 escala = glm::vec3(1.0,1.0,1.0),float angulo = 0.0, float altura = 0.0, float largura = 0.0, float frames = 1.0, float animacoes = 1.0);
+	void inicializar(GLuint texID,glm::vec3 pos = glm::vec3(0), glm::vec3 escala = glm::vec3(1),float angulo = 0.0, float altura = 0.0, float largura = 0.0, float frames = 1.0, float animacoes = 1.0);
 	void desenhar();
 
 	inline void setShader(Shader* shader) { this->shader = shader; }

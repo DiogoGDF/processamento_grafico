@@ -10,15 +10,15 @@ void Sprite::inicializar(GLuint texID, glm::vec3 pos, glm::vec3 escala, float an
 {
 	this->texID = texID;
 	this->pos = pos;
-	this->escala.x = escala.x / frames;
-	this->escala.y = escala.y / animacoes;
+	this->escala.x = escala.x;
+	this->escala.y = escala.y;
 	this->angulo = angulo;
 	this->altura = altura;
 	this->largura = largura;
 	this->frames = frames;
 	this->animacoes = animacoes;
 
-	if (animacoes > 1.0) {
+	if (animacoes > 1.0 || frames > 1.0) {
 		altura = 1.0 / animacoes;
 		largura = 1.0 / frames;
 	}
