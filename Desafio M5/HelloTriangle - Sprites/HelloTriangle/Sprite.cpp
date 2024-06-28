@@ -6,16 +6,22 @@ Sprite::~Sprite()
 	glDeleteVertexArrays(1, &VAO);
 }
 
-void Sprite::inicializar(GLuint texID, glm::vec3 pos, glm::vec3 escala, float angulo, float altura, float largura)
+void Sprite::inicializar(GLuint texID, glm::vec3 pos, glm::vec3 escala, float angulo, float altura, float largura, float frames, float animacoes)
 {
 	this->texID = texID;
 	this->pos = pos;
-	this->escala = escala;
+	this->escala.x = escala.x / frames;
+	this->escala.y = escala.y / animacoes;
 	this->angulo = angulo;
 	this->altura = altura;
 	this->largura = largura;
+	this->frames = frames;
+	this->animacoes = animacoes;
 
-	cout << "Altura: " << altura << " Largura: " << largura << endl;
+	if (animacoes > 1.0) {
+		altura = 1.0 / animacoes;
+		largura = 1.0 / frames;
+	}
 
 	GLfloat vertices[] = {
 		//Triangulo 0

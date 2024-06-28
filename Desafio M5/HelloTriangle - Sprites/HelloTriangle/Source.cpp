@@ -24,7 +24,7 @@ using namespace std;
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 
 // Protótipos das funções
-GLuint loadTexture(string texturePath);
+GLuint loadTexture(string texturePath, float &imgWidth, float &imgHeight);
 
 // Dimensões da janela (pode ser alterado em tempo de execução)
 const GLuint WIDTH = 800, HEIGHT = 600;
@@ -79,32 +79,33 @@ int main()
 	// Compilando e buildando o programa de shader
 	Shader shader("../shaders/tex.vs", "../shaders/tex.fs");
 
-	GLuint texID1 = loadTexture("../../Textures/backgrounds/PNG/Cybercity2/Night/1.png");
-	GLuint texID2 = loadTexture("../../Textures/characters/PNG/Biker/Biker_idle.png");
-	GLuint texID3 = loadTexture("../../Textures/backgrounds/PNG/Cybercity2/Night/3.png");
-	GLuint texID5 = loadTexture("../../Textures/backgrounds/PNG/Cybercity2/Tiles/Tile_26.png");
-	GLuint texID6 = loadTexture("../../Textures/backgrounds/PNG/Cybercity2/Tiles/Tile_37.png");
+	float imgWidth, imgHeight;
+	GLuint texID1 = loadTexture("../../Textures/backgrounds/PNG/Cybercity2/Night/1.png", imgWidth, imgHeight);
+	GLuint texID2 = loadTexture("../../Textures/characters/PNG/Biker/Biker_idle.png", imgWidth, imgHeight);
+	GLuint texID3 = loadTexture("../../Textures/backgrounds/PNG/Cybercity2/Night/3.png", imgWidth, imgHeight);
+	GLuint texID5 = loadTexture("../../Textures/backgrounds/PNG/Cybercity2/Tiles/Tile_26.png", imgWidth, imgHeight);
+	GLuint texID6 = loadTexture("../../Textures/backgrounds/PNG/Cybercity2/Tiles/Tile_37.png", imgWidth, imgHeight);
 
 	//Criação de uma sprite
 
 	spr.setShader(&shader);
-	spr.inicializar(texID2, glm::vec3(400.0, 100.0, 0.0), glm::vec3(100.0, 100.0, 1.0), 0.0, 1.0, 0.25);
+	spr.inicializar(texID2, glm::vec3(400.0, 83.0, 0.0), glm::vec3(imgWidth*2, imgHeight*2, 1.0), 0.0, 1.0, 0.25, 1.0, 1.0);
 	
 	Sprite background;
 	background.setShader(&shader);
-	background.inicializar(texID1, glm::vec3(400.0, 320.0, 0.0), glm::vec3(1920.0/2.0, 1080.0/2.0, 1.0), 0.0, 1.0, 1.0);
+	background.inicializar(texID1, glm::vec3(400.0, 320.0, 0.0), glm::vec3(1920.0/2.0, 1080.0/2.0, 1.0), 0.0, 1.0, 1.0, 1.0, 1.0);
 
 	Sprite background2;
 	background2.setShader(&shader);
-	background2.inicializar(texID3, glm::vec3(400.0, 310.0, 0.0), glm::vec3(1920.0/2.0, 1080.0/2.0, 1.0), 0.0, 1.0, 1.0);
+	background2.inicializar(texID3, glm::vec3(400.0, 310.0, 0.0), glm::vec3(1920.0/2.0, 1080.0/2.0, 1.0), 0.0, 1.0, 1.0, 1.0, 1.0);
 
 	Sprite chao;
 	chao.setShader(&shader);
-	chao.inicializar(texID5, glm::vec3(400.0, 35.0, 0.0), glm::vec3(1920.0/2.0, 32.0, 1.0), 0.0, 1.0, 30.0);
+	chao.inicializar(texID5, glm::vec3(400.0, 35.0, 0.0), glm::vec3(1920.0/2.0, 32.0, 1.0), 0.0, 1.0, 30.0, 1.0, 1.0);
 
 	Sprite chao2;
 	chao2.setShader(&shader);
-	chao2.inicializar(texID6, glm::vec3(400.0, 1.0, 0.0), glm::vec3(1920.0/2.0, 32.0, 1.0), 0.0, 1.0, 30.0);
+	chao2.inicializar(texID6, glm::vec3(400.0, 1.0, 0.0), glm::vec3(1920.0/2.0, 32.0, 1.0), 0.0, 1.0, 30.0, 1.0, 1.0);
 
 	//Ativando o buffer de textura 0 da opengl
 	glActiveTexture(GL_TEXTURE0);
@@ -159,7 +160,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		glfwSetWindowShouldClose(window, GL_TRUE);
 }
 
-GLuint loadTexture(string texturePath)
+GLuint loadTexture(string texturePath, float &imgWidth, float &imgHeight)
 {
     GLuint texID;
 
@@ -189,6 +190,9 @@ GLuint loadTexture(string texturePath)
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         }
         glGenerateMipmap(GL_TEXTURE_2D);
+
+		imgWidth = (float)width;
+		imgHeight = (float)height;
     }
     else
     {
