@@ -17,6 +17,9 @@ class Sprite
     void atualizar();
     void desenhar();
     void finalizar();
+    void moverParaDireita();
+    void moverParaEsquerda();
+
 
     inline void setShader(Shader *shader) { this->shader = shader; }
     inline void setAngulo(float angulo) { this->angulo = angulo; }
@@ -33,8 +36,18 @@ class Sprite
     int nAnimations, nFrames, iAnimation, iFrame;
     glm::vec2 offsetTex; //ds e dt 
 
+    float vel;
+
     Shader *shader;
 
     float lastTime;
     float FPS;
+
+public:
+    void setPos(const glm::vec3& newPos) {
+        pos = newPos;
+    }
+    glm::vec3 getPos() const {
+        return pos;
+    }
 };

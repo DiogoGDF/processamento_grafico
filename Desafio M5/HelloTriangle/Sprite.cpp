@@ -16,6 +16,8 @@ void Sprite::inicializar(GLuint texID, int nAnimations, int nFrames, glm::vec3 p
 	this->nFrames = nFrames;
 	this->largura = largura;
 
+	vel = 5.0;
+
 	if (largura == 1) {
 		offsetTex.s = 1.0/ (float) nFrames;
 		offsetTex.t = 1.0/ (float) nAnimations; 
@@ -56,9 +58,24 @@ void Sprite::inicializar(GLuint texID, int nAnimations, int nFrames, glm::vec3 p
 
 	glBindVertexArray(0);
 
-	FPS = 12.0;
+	FPS = 10.0;
 	lastTime = 0.0;
 
+}
+
+void Sprite::moverParaDireita()
+{
+	pos.x += vel;
+	if (escala.x < 0.0)
+		escala.x = -escala.x;
+
+}
+
+void Sprite::moverParaEsquerda()
+{
+	pos.x -= vel;
+	if (escala.x > 0.0)
+		escala.x = -escala.x;
 }
 
 void Sprite::atualizar()
@@ -69,10 +86,9 @@ void Sprite::atualizar()
 
 	if (dt >= 1 / FPS)
 	{
-		iFrame = (iFrame + 1) % nFrames; //incrementando ciclicamente o indice do Frame
+		iFrame = (iFrame + 1) % nFrames;
 		lastTime = now;
 	}
-	//Calculando o quanto teremos que deslocar nas coordenadas de textura
 	float offsetTexFrameS = iFrame * offsetTex.s; 
 	float offsetTexFrameT = iAnimation * offsetTex.t; 
 	shader->setVec2("offsetTex",offsetTexFrameS,offsetTexFrameT);

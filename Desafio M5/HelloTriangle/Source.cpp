@@ -37,6 +37,9 @@ GLuint loadTexture(string filePath, int &imgWidth, int &imgHeight);
 
 const GLuint WIDTH = 800, HEIGHT = 600;
 
+Sprite idle, running;
+bool moving = false;
+
 int main()
 {
 	// soundtrack
@@ -61,8 +64,6 @@ int main()
 
 	const GLubyte* renderer = glGetString(GL_RENDERER); /* get renderer string */
 	const GLubyte* version = glGetString(GL_VERSION); /* version as a string */
-	cout << "Renderer: " << renderer << endl;
-	cout << "OpenGL version supported " << version << endl;
 
 	int width, height;
 	glfwGetFramebufferSize(window, &width, &height);
@@ -82,9 +83,13 @@ int main()
 	int imgWidth, imgHeight;
 	GLuint texID = loadTexture("../../Textures/characters/PNG/Biker/Biker_idle.png", imgWidth, imgHeight);
 	
-	Sprite sprite, background,background2, ground, ground2;
-	sprite.inicializar(texID, 1, 4, glm::vec3(400.0,60.0,0.0), glm::vec3(imgWidth*2,imgHeight*2,1.0),0.0,glm::vec3(1.0,0.0,1.0), 1.0);
-	sprite.setShader(&shader);
+	Sprite background,background2, ground, ground2;
+	idle.inicializar(texID, 1, 4, glm::vec3(400.0,60.0,0.0), glm::vec3(imgWidth*1.5, imgHeight * 1.5, 1.0), 0.0, glm::vec3(1.0, 0.0, 1.0), 1.0);
+	idle.setShader(&shader);
+	
+	texID = loadTexture("../../Textures/characters/PNG/Biker/Biker_run.png", imgWidth, imgHeight);
+	running.inicializar(texID, 1, 6, glm::vec3(400.0,60.0,0.0), glm::vec3(imgWidth*1.5,imgHeight*1.5,1.0),0.0,glm::vec3(1.0,0.0,1.0), 1.0);
+	running.setShader(&shader);
 
 	texID = loadTexture("../../Textures/backgrounds/PNG/Cybercity2/Night/1.png", imgWidth, imgHeight);
 	background.inicializar(texID, 1, 1, glm::vec3(450.0,300.0,0.0), glm::vec3(imgWidth*2,imgHeight*2,1.0),0.0,glm::vec3(1.0,0.0,1.0), 1.0);
@@ -95,7 +100,7 @@ int main()
 	background2.setShader(&shader);
 
 	texID = loadTexture("../../Textures/backgrounds/PNG/Cybercity2/Tiles/Tile_26.png", imgWidth, imgHeight);
-	ground.inicializar(texID, 1, 1, glm::vec3(400.0,0.0,0.0), glm::vec3(800,imgHeight,1.0),0.0,glm::vec3(0.0,1.0,1.0), 30.0);
+	ground.inicializar(texID, 1, 1, glm::vec3(400.0,10.0,0.0), glm::vec3(800,imgHeight,1.0),0.0,glm::vec3(0.0,1.0,1.0), 30.0);
 	ground.setShader(&shader);
 
 	glm::mat4 projection = glm::ortho(0.0, 800.0, 0.0, 600.0, -1.0, 1.0);
@@ -116,7 +121,10 @@ int main()
 
 		ground.desenhar();
 
-		sprite.desenhar();
+		if (moving)
+			running.desenhar();
+		else
+			idle.desenhar();
 
 		glfwSwapBuffers(window);
 	}
@@ -129,6 +137,33 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 {
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
+	if (key == GLFW_KEY_D || key == GLFW_KEY_RIGHT)
+	{
+		moving = true;
+		running.moverParaDireita();
+		if (action == GLFW_RELEASE)
+		{
+			moving = false;
+			idle.setPos(running.getPos());
+		}
+	}
+	else if (key == GLFW_KEY_A || key == GLFW_KEY_LEFT)
+	{
+		moving = true;
+		running.moverParaEsquerda();
+		if (action == GLFW_RELEASE)
+		{
+			moving = false;
+			idle.setPos(running.getPos());
+
+		}
+	}
+	else
+	{
+		moving = false;
+	}
+
+
 }
 
 GLuint loadTexture(string filePath, int &imgWidth, int &imgHeight)
