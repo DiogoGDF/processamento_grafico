@@ -1,10 +1,12 @@
 #include "Sprite.h"
 
+// Destrutor
 Sprite::~Sprite()
 {
 	glDeleteVertexArrays(1, &VAO);
 }
 
+// Construtor
 void Sprite::inicializar(GLuint texID, int nAnimations, int nFrames, glm::vec3 pos, glm::vec3 escala, float angulo, glm::vec3 cor, float largura)
 {
     this->pos = pos;
@@ -16,8 +18,10 @@ void Sprite::inicializar(GLuint texID, int nAnimations, int nFrames, glm::vec3 p
 	this->nFrames = nFrames;
 	this->largura = largura;
 
+	// Velocidade padrão
 	vel = 5.0;
 
+	// Parâmetro para repetir a textura quando desejado
 	if (largura == 1) {
 		offsetTex.s = 1.0/ (float) nFrames;
 		offsetTex.t = 1.0/ (float) nAnimations; 
@@ -27,6 +31,7 @@ void Sprite::inicializar(GLuint texID, int nAnimations, int nFrames, glm::vec3 p
 		offsetTex.t = 1.0/ (float) nAnimations;
 	}
 
+	// Retangulo a base de dois triângulos; offsetTex é o parâmetro para animação
     GLfloat vertices[] = {
 		//x   y    z    r      g      b      s    t
 		-0.5, 0.5, 0.0, cor.r, cor.g, cor.b, 0.0, offsetTex.t, //v0
@@ -58,32 +63,39 @@ void Sprite::inicializar(GLuint texID, int nAnimations, int nFrames, glm::vec3 p
 
 	glBindVertexArray(0);
 
+	// Frames por segundo
 	FPS = 10.0;
+	// iniciando o tempo
 	lastTime = 0.0;
-
 }
 
+// Função para mover o sprite para a direita
 void Sprite::moverParaDireita()
 {
+	// Atualiza a posição
 	pos.x += vel;
+	// Se a escala for negativa, inverte a escala para 
 	if (escala.x < 0.0)
 		escala.x = -escala.x;
 
 }
 
+// Função para mover o sprite para a esquerda
 void Sprite::moverParaEsquerda()
 {
+	// Atualiza a posição
 	pos.x -= vel;
+	// Se a escala for positiva, inverte a escala
 	if (escala.x > 0.0)
 		escala.x = -escala.x;
 }
 
+// Função para atualizar o sprite
 void Sprite::atualizar()
 {
+	// Atualizando a textura de acordo com o FPS para animação
 	float now = glfwGetTime();
-
 	float dt = now - lastTime;
-
 	if (dt >= 1 / FPS)
 	{
 		iFrame = (iFrame + 1) % nFrames;
@@ -93,25 +105,21 @@ void Sprite::atualizar()
 	float offsetTexFrameT = iAnimation * offsetTex.t; 
 	shader->setVec2("offsetTex",offsetTexFrameS,offsetTexFrameT);
 
-    glm::mat4 model = glm::mat4(1); //matriz identidade
+	// Atualizando a posição do sprite
+    glm::mat4 model = glm::mat4(1);
     model = glm::translate(model, pos);
 	model = glm::rotate(model,glm::radians(angulo), glm::vec3(0.0, 0.0, 1.0));
     model = glm::scale(model, escala);
     shader->setMat4("model", glm::value_ptr(model));
 }
 
+// Função para desenhar o sprite na tela
 void Sprite::desenhar()
 {
     atualizar();
-
-
-	glBindTexture(GL_TEXTURE_2D, texID); //Conectando com a textura
-
-    glBindVertexArray(VAO); //Conectando ao buffer de geometria
-
-	// Poligono Preenchido - GL_TRIANGLES
+	glBindTexture(GL_TEXTURE_2D, texID);
+    glBindVertexArray(VAO);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
-
-    glBindVertexArray(0); //desconectando o buffer de geometria
+    glBindVertexArray(0); 
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
