@@ -138,7 +138,7 @@ int main()
 	shaderDebug.setMat4("projection", glm::value_ptr(projection));
 
 	posIni.x = tileSize.x * 5;
-	posIni.y = tileSize.y * 5;
+	posIni.y = tileSize.y * 6;
 
 	iPos.x = 1;
 	iPos.y = 1;

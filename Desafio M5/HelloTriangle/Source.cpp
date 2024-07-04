@@ -77,7 +77,7 @@ int main()
 	glDepthFunc(GL_ALWAYS);
 
 	// Compilando shaders
-	Shader shader("HelloTriangle.vs","HelloTriangle.fs");
+	Shader shader("../shaders/HelloTriangle.vs","../shaders/HelloTriangle.fs");
 	shader.Use();
 
 	//  ***** Lendo texturas e inicializando sprites ****
