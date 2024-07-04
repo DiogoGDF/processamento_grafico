@@ -137,8 +137,8 @@ int main()
 	shaderDebug.Use();
 	shaderDebug.setMat4("projection", glm::value_ptr(projection));
 
-	posIni.x = tileSize.x / 2;
-	posIni.y = tileSize.y / 2;
+	posIni.x = tileSize.x * 5;
+	posIni.y = tileSize.y * 5;
 
 	iPos.x = 1;
 	iPos.y = 1;
@@ -328,29 +328,36 @@ GLuint setupTile()
 	return VAO;
 }
 
-void drawMap(Shader& shader)
-{
+// Função para calcular a posição de desenho de cada tile
+glm::vec2 calculoPosicaoDesenho(int column, int row, float tileWidth, float tileHeight) {
+	float x = column * tileWidth / 2.0f + row * tileWidth / 2.0f;
+	float y = column * tileHeight / 2.0f - row * tileHeight / 2.0f;
+	return glm::vec2(x, y);
+}
+
+// Modificação na função drawMap para usar a calculoPosicaoDesenho
+void drawMap(Shader& shader) {
 	shader.Use();
 
 	glBindTexture(GL_TEXTURE_2D, tilesetTexID);
 	glBindVertexArray(VAOTile);
 
-	for (int i = 0; i < tilemapSize.y; i++)
-	{
-		for (int j = 0; j < tilemapSize.x; j++)
-		{
+	for (int i = 0; i < tilemapSize.y; i++) {
+		for (int j = 0; j < tilemapSize.x; j++) {
+			glm::vec2 posDesenho = calculoPosicaoDesenho(j, i, tileSize.x, tileSize.y);
+
 			glm::mat4 model = glm::mat4(1);
-			model = glm::translate(model, glm::vec3(posIni.x + j * tileSize.x, posIni.y + i * tileSize.y, 0.0));
+			model = glm::translate(model, glm::vec3(posIni.x + posDesenho.x, posIni.y + posDesenho.y, 0.0));
 			model = glm::scale(model, glm::vec3(tileSize.x, tileSize.y, 1.0));
+			model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0.0, 0.0, 1.0));
+
 			shader.setMat4("model", glm::value_ptr(model));
 
 			int indiceTile = tilemap[i][j];
 			shader.setVec2("offsetTex", indiceTile * offsetTex.x, offsetTex.y);
 
 			glDrawArrays(GL_TRIANGLES, 0, 6);
-
 		}
-
 	}
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glBindVertexArray(0);
