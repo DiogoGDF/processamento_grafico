@@ -88,8 +88,8 @@ int main()
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_ALWAYS);
 
-	Shader shader("HelloTriangle.vs", "HelloTriangle.fs");
-	Shader shaderDebug("HelloTriangle.vs", "HelloTriangleDebug.fs");
+	Shader shader("../shaders/HelloTriangle.vs", "../shaders/HelloTriangle.fs");
+	Shader shaderDebug("../shaders/HelloTriangle.vs", "../shaders/HelloTriangleDebug.fs");
 
 	int imgWidth, imgHeight;
 	GLuint texID = loadTexture("./knight.png", imgWidth, imgHeight);
