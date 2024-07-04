@@ -4,23 +4,28 @@
 #include <string>
 #include <assert.h>
 #include <windows.h>  
-#include <fstream>
 
 using namespace std;
 
+// GLAD
 #include <glad/glad.h>
 
+// GLFW
 #include <GLFW/glfw3.h>
 
+//Classe que gerencia os shaders
 #include "Shader.h"
 
+//GLM
 #include <glm/glm.hpp> 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+//STB_IMAGE
 #include <stb_image.h>
 
 #include "Sprite.h"
+#include "Tile.h"
 
 #include "Timer.h"
 
@@ -28,31 +33,13 @@ enum directions { NONE = -1, LEFT, RIGHT, UP, DOWN };
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 
+// Protótipos das funções
 GLuint loadTexture(string filePath, int& imgWidth, int& imgHeight);
 bool CheckCollision(Sprite& one, Sprite& two);
 
 const GLuint WIDTH = 800, HEIGHT = 600;
 
 int dir = NONE;
-
-GLuint tilesetTexID;
-glm::vec2 offsetTex; 
-GLuint VAOTile;
-int nTiles;
-glm::vec2 tileSize;
-
-glm::vec2 tilemapSize;
-const int MAX_COLUNAS = 15;
-const int MAX_LINHAS = 15;
-int tilemap[MAX_LINHAS][MAX_COLUNAS]; 
-
-void loadMap(string fileName);
-GLuint setupTile();
-void drawMap(Shader& shader);
-
-glm::vec2 iPos; 
-
-glm::vec2 posIni; 
 
 int main()
 {
@@ -88,47 +75,50 @@ int main()
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_ALWAYS);
 
-	Shader shader("HelloTriangle.vs", "HelloTriangle.fs");
-	Shader shaderDebug("HelloTriangle.vs", "HelloTriangleDebug.fs");
+
+
+	// Compilando e buildando o programa de shader
+	Shader shader("../shaders/HelloTriangle.vs", "../shaders/HelloTriangle.fs");
+	Shader shaderDebug("../shaders/HelloTriangle.vs", "../shaders/HelloTriangleDebug.fs");
 
 	int imgWidth, imgHeight;
-	GLuint texID = loadTexture("./knight.png", imgWidth, imgHeight);
+	GLuint texID = loadTexture("../../Textures/characters/PNG/Knight/walk.png", imgWidth, imgHeight);
 
+	//Criação de um objeto Sprite
 	Sprite player, coin, sprite3, background, ground, sprite4;
-	player.inicializar(texID, 1, 1, glm::vec3(400.0, 150.0, 0.0), glm::vec3(imgWidth * 0.5, imgHeight * 0.5, 1.0), 0.0, glm::vec3(1.0, 0.0, 1.0));
+	player.inicializar(texID, 1, 6, glm::vec3(400.0, 150.0, 0.0), glm::vec3(imgWidth * 2, imgHeight * 2, 1.0), 0.0, glm::vec3(1.0, 0.0, 1.0));
 	player.setShader(&shader);
 	player.setShaderDebug(&shaderDebug);
 
-	//texID = loadTexture("../Textures/items/Pirate-Stuff/Icon31.png", imgWidth, imgHeight);
+	texID = loadTexture("../../Textures/items/Pirate-Stuff/Icon31.png", imgWidth, imgHeight);
+	//Criação de um objeto Sprite
 	coin.inicializar(texID, 1, 1, glm::vec3(450.0, 700.0, 0.0), glm::vec3(imgWidth * 2, imgHeight * 2, 1.0), 0.0, glm::vec3(1.0, 0.0, 1.0));
 	coin.setShader(&shader);
 	coin.setShaderDebug(&shaderDebug);
 
-	//sprite2.inicializar(glm::vec3(200.0,300.0,0.0), glm::vec3(100.0,50.0,1.0));
-	//sprite2.setShader(&shader);
-
-	//sprite3.inicializar(glm::vec3(600.0,300.0,0.0), glm::vec3(50.0,100.0,1.0), 0.0,glm::vec3(0.0,0.5,0.0));
-	//sprite3.setShader(&shader);
-	//GLuint texID2 = loadTexture("../Textures/backgrounds/fantasy-set/PNG/Battleground1/Bright/Battleground1.png", imgWidth, imgHeight);
-
-	//background.inicializar(texID2, 1, 1, glm::vec3(400.0, 300.0, 0.0), glm::vec3(imgWidth / 2, imgHeight / 2, 1.0), 0.0, glm::vec3(0.0, 1.0, 1.0));
+	GLuint texID2 = loadTexture("../../Textures/backgrounds/fantasy-set/PNG/Battleground1/Bright/Battleground1.png", imgWidth, imgHeight);
+	background.inicializar(texID2, 1, 1, glm::vec3(400.0, 300.0, 0.0), glm::vec3(imgWidth / 2, imgHeight / 2, 1.0), 0.0, glm::vec3(0.0, 1.0, 1.0));
 	background.setShader(&shader);
 	background.setShaderDebug(&shaderDebug);
 
-	//ground.inicializar(glm::vec3(400.0,100.0,0.0), glm::vec3(800.0,200.0,1.0),0.0,glm::vec3(0.5,0.5,0.0));
-	//ground.setShader(&shader);
+	Tile tile;
+	tile.inicializar(texID2, 1, 1, glm::vec3(400.0, 300.0, 0.0), glm::vec3(64, 32, 1.0), 0.0, glm::vec3(0.0, 1.0, 1.0));
+	tile.setShader(&shader);
+	tile.setShaderDebug(&shaderDebug);
 
-	//sprite4.inicializar(glm::vec3(200.0,500.0,0.0), glm::vec3(100.0,100.0,1.0),45.0,glm::vec3(1.0,1.0,0.0));
-	//sprite4.setShader(&shader);
 
+	//Matriz de projeção (paralela ortográfica)
+	// Exercício 1 da Lista 2
 	//glm::mat4 projection = glm::ortho(-10.0, 10.0, -10.0, 10.0, -1.0, 1.0);
 
-	loadMap("map2.txt");
-	VAOTile = setupTile();
 
+	//Habilita o shader que sera usado (glUseProgram)
 	shader.Use();
 
-	glm::mat4 projection = glm::ortho(0.0, 800.0, 600.0, 0.0, -1.0, 1.0);
+
+	// Exercício 2 da Lista 2
+	glm::mat4 projection = glm::ortho(0.0, 800.0, 0.0, 600.0, -1.0, 1.0);
+	//Enviando para o shader via variável do tipo uniform (glUniform....)
 	shader.setMat4("projection", glm::value_ptr(projection));
 
 	glActiveTexture(GL_TEXTURE0);
@@ -137,29 +127,35 @@ int main()
 	shaderDebug.Use();
 	shaderDebug.setMat4("projection", glm::value_ptr(projection));
 
-	posIni.x = tileSize.x / 2;
-	posIni.y = tileSize.y / 2;
+	//Timer timer;
 
-	iPos.x = 1;
-	iPos.y = 1;
 
 	while (!glfwWindowShouldClose(window))
 	{
 		//timer.start();
 		glfwPollEvents();
 
-
+		if (dir == LEFT)
+		{
+			player.moveLeft();
+		}
+		else if (dir == RIGHT)
+		{
+			player.moveRight();
+		}
 
 		// Limpa o buffer de cor
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f); 
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f); //cor de fundo
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		drawMap(shader);
-		float x = posIni.x + iPos.x * tileSize.x;
-		float y = posIni.y + iPos.y * tileSize.y;
-		player.setPosicao(glm::vec3(x, y, 0.0)); 
-		player.desenhar();
+		//background.desenhar();
+		//ground.desenhar();
+		//player.desenhar();
+		//coin.moveItem();
+		//coin.desenhar();
+		tile.desenhar();
 
+		// Troca os buffers da tela
 		glfwSwapBuffers(window);
 	}
 
@@ -172,25 +168,13 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
 
-	if (key == GLFW_KEY_A && action == GLFW_PRESS)
+	if (key == GLFW_KEY_A)
 	{
 		dir = LEFT;
-		iPos.x -= 1;
 	}
-	if (key == GLFW_KEY_D && action == GLFW_PRESS)
+	if (key == GLFW_KEY_D)
 	{
 		dir = RIGHT;
-		iPos.x += 1;
-	}
-	if (key == GLFW_KEY_W && action == GLFW_PRESS)
-	{
-		dir = LEFT;
-		iPos.y -= 1;
-	}
-	if (key == GLFW_KEY_S && action == GLFW_PRESS)
-	{
-		dir = RIGHT;
-		iPos.y += 1;
 	}
 
 	if (action == GLFW_RELEASE)
@@ -204,6 +188,7 @@ GLuint loadTexture(string filePath, int& imgWidth, int& imgHeight)
 {
 	GLuint texID;
 
+	// Gera o identificador da textura na memória 
 	glGenTextures(1, &texID);
 	glBindTexture(GL_TEXTURE_2D, texID);
 
@@ -218,11 +203,11 @@ GLuint loadTexture(string filePath, int& imgWidth, int& imgHeight)
 
 	if (data)
 	{
-		if (nrChannels == 3) 
+		if (nrChannels == 3) //jpg, bmp
 		{
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 		}
-		else 
+		else //png
 		{
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 		}
@@ -238,7 +223,7 @@ GLuint loadTexture(string filePath, int& imgWidth, int& imgHeight)
 	}
 	else
 	{
-		std::cout << "Failed to load texture" << std::endl;
+		std::cout << "Failed to load texture " << filePath << std::endl;
 	}
 	return texID;
 }
@@ -253,105 +238,4 @@ bool CheckCollision(Sprite& one, Sprite& two)
 		two.getPMax().y >= one.getPMin().y;
 	// collision only if on both axes
 	return collisionX && collisionY;
-}
-
-void loadMap(string fileName)
-{
-	ifstream arqEntrada;
-	arqEntrada.open(fileName); 
-	if (arqEntrada)
-	{
-		string textureName;
-		int width, height;
-		arqEntrada >> textureName >> nTiles >> tileSize.y >> tileSize.x;
-		tilesetTexID = loadTexture(textureName, width, height);
-		cout << textureName << " " << nTiles << " " << tileSize.y << " " << tileSize.x << endl;
-		arqEntrada >> tilemapSize.y >> tilemapSize.x; 
-		cout << tilemapSize.y << " " << tilemapSize.x << endl;
-		for (int i = 0; i < tilemapSize.y; i++)
-		{
-			for (int j = 0; j < tilemapSize.x; j++) 
-			{
-				arqEntrada >> tilemap[i][j];
-				cout << tilemap[i][j] << " ";
-			}
-			cout << endl;
-		}
-
-	}
-	else
-	{
-		cout << "Houve um problema na leitura de " << fileName << endl;
-	}
-}
-
-GLuint setupTile()
-{
-	GLuint VAO;
-
-	offsetTex.s = 1.0 / (float)nTiles;
-	offsetTex.t = 1.0;
-	glm::vec3 cor;
-	cor.r = 1.0;
-	cor.g = 0.0;
-	cor.b = 1.0;
-	GLfloat vertices[] = {
-		//x   y    z    r      g      b      s    t
-		-0.5, 0.5, 0.0, cor.r, cor.g, cor.b, 0.0, offsetTex.t, //v0
-		-0.5,-0.5, 0.0, cor.r, cor.g, cor.b, 0.0, 0.0, //v1
-		 0.5, 0.5, 0.0, cor.r, cor.g, cor.b, offsetTex.s, offsetTex.t, //v2
-		-0.5,-0.5, 0.0, cor.r, cor.g, cor.b, 0.0, 0.0, //v1
-		 0.5,-0.5, 0.0, cor.r, cor.g, cor.b, offsetTex.s, 0.0, //v3
-		 0.5, 0.5, 0.0, cor.r, cor.g, cor.b, offsetTex.s, offsetTex.t  //v2
-	};
-
-	GLuint VBO;
-	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)0);
-	glEnableVertexAttribArray(0);
-
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(1);
-
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(6 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(2);
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	glBindVertexArray(0);
-	return VAO;
-}
-
-void drawMap(Shader& shader)
-{
-	shader.Use();
-
-	glBindTexture(GL_TEXTURE_2D, tilesetTexID);
-	glBindVertexArray(VAOTile);
-
-	for (int i = 0; i < tilemapSize.y; i++)
-	{
-		for (int j = 0; j < tilemapSize.x; j++)
-		{
-			glm::mat4 model = glm::mat4(1);
-			model = glm::translate(model, glm::vec3(posIni.x + j * tileSize.x, posIni.y + i * tileSize.y, 0.0));
-			model = glm::scale(model, glm::vec3(tileSize.x, tileSize.y, 1.0));
-			shader.setMat4("model", glm::value_ptr(model));
-
-			int indiceTile = tilemap[i][j];
-			shader.setVec2("offsetTex", indiceTile * offsetTex.x, offsetTex.y);
-
-			glDrawArrays(GL_TRIANGLES, 0, 6);
-
-		}
-
-	}
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glBindVertexArray(0);
 }

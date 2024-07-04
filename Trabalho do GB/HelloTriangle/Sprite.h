@@ -1,4 +1,4 @@
-//#pragma once
+#pragma once
 
 //GLM
 #include <glm/glm.hpp> 
@@ -6,7 +6,6 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Shader.h"
-
 
 class Sprite
 {
@@ -27,8 +26,6 @@ public:
     inline void setShader(Shader* shader) { this->shader = shader; }
     inline void setShaderDebug(Shader* shader) { this->shaderDebug = shader; }
     inline void setAngulo(float angulo) { this->angulo = angulo; }
-
-    inline void setPosicao(glm::vec3 novaPos) { this->pos = novaPos; }
 
     inline glm::vec3 getPMin() { return this->pmin; }
     inline glm::vec3 getPMax() { return this->pmax; }
