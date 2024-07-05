@@ -43,7 +43,7 @@ GLuint loadTexture(string filePath, int& imgWidth, int& imgHeight);
 bool CheckCollision(Sprite& one, Sprite& two);
 
 // Dimensões da janela
-const GLuint WIDTH = 800, HEIGHT = 600;
+const GLuint WIDTH = 1200, HEIGHT = 1000;
 
 // Variáveis globais
 int dir = NONE;
@@ -55,8 +55,8 @@ int nTiles;
 glm::vec2 tileSize;
 
 glm::vec2 tilemapSize;
-const int MAX_COLUNAS = 15;
-const int MAX_LINHAS = 15;
+const int MAX_COLUNAS = 20;
+const int MAX_LINHAS = 20;
 int tilemap[MAX_LINHAS][MAX_COLUNAS]; 
 
 // Funções para carregar e desenhar o mapa
@@ -72,7 +72,7 @@ bool moving = false;
 int main()
 {
 	// Trilha sonora
-	PlaySound(TEXT("../../Soundtrack/end_of_line.wav"), NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
+	//PlaySound(TEXT("../../Soundtrack/end_of_line.wav"), NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
 
 	glfwInit();
 
@@ -125,7 +125,7 @@ int main()
 	coin.setShader(&shader);
 	coin.setShaderDebug(&shaderDebug);
 
-	loadMap("map2.txt");
+	loadMap("map.txt");
 	VAOTile = setupTile();
 
 	shader.Use();
@@ -139,11 +139,11 @@ int main()
 	shaderDebug.Use();
 	shaderDebug.setMat4("projection", glm::value_ptr(projection));
 
-	posIni.x = tileSize.x * 5;
-	posIni.y = tileSize.y * 6;
+	posIni.x = tileSize.x * 1.2;
+	posIni.y = tileSize.y * 12;
 
-	iPos.x = 1;
-	iPos.y = 1;
+	iPos.x = 10;
+	iPos.y = 3;
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -195,6 +195,21 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 			dir = NONE;
 		}
 	}
+	else if (key == GLFW_KEY_W)
+	{
+		dir = LEFT;
+		iPos.y -= 0.1;
+		running.moveLeft();
+		moving = true;
+		if (action == GLFW_RELEASE)
+		{
+			moving = false;
+			// Trocar o sprite para o de parado (colocando na posição do sprite de corrida)
+			idle.setPosicao(running.getPosicao());
+			idle.moveLeft();
+			dir = NONE;
+		}
+	}
 	else if (key == GLFW_KEY_E)
 	{
 		dir = RIGHT;
@@ -211,27 +226,10 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 			dir = NONE;
 		}
 	}
-	else if (key == GLFW_KEY_Z)
-	{
-		dir = LEFT;
-		iPos.x -= 0.1;
-		iPos.y += 0.1;
-		running.moveLeft();
-		moving = true;
-		if (action == GLFW_RELEASE)
-		{
-			moving = false;
-			// Trocar o sprite para o de parado (colocando na posição do sprite de corrida)
-			idle.setPosicao(running.getPosicao());
-			idle.moveLeft();
-			dir = NONE;
-		}
-	}
-	else if (key == GLFW_KEY_C)
+	else if (key == GLFW_KEY_D)
 	{
 		dir = RIGHT;
 		iPos.x += 0.1;
-		iPos.y += 0.1;
 		running.moveRight();
 		moving = true;
 		if (action == GLFW_RELEASE)
@@ -258,25 +256,11 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 			dir = NONE;
 		}
 	}
-	else if (key == GLFW_KEY_D)
-	{
-		dir = RIGHT;
-		iPos.x += 0.1;
-		running.moveRight();
-		moving = true;
-		if (action == GLFW_RELEASE)
-		{
-			moving = false;
-			// Trocar o sprite para o de parado (colocando na posição do sprite de corrida)
-			idle.setPosicao(running.getPosicao());
-			idle.moveRight();
-			dir = NONE;
-		}
-	}
-	else if (key == GLFW_KEY_W)
+	else if (key == GLFW_KEY_LEFT_SHIFT)
 	{
 		dir = LEFT;
-		iPos.y -= 0.1;
+		iPos.x -= 0.1;
+		iPos.y += 0.1;
 		running.moveLeft();
 		moving = true;
 		if (action == GLFW_RELEASE)
@@ -291,6 +275,22 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	else if (key == GLFW_KEY_S)
 	{
 		dir = RIGHT;
+		iPos.y += 0.1;
+		running.moveRight();
+		moving = true;
+		if (action == GLFW_RELEASE)
+		{
+			moving = false;
+			// Trocar o sprite para o de parado (colocando na posição do sprite de corrida)
+			idle.setPosicao(running.getPosicao());
+			idle.moveRight();
+			dir = NONE;
+		}
+	}
+	else if (key == GLFW_KEY_C)
+	{
+		dir = RIGHT;
+		iPos.x += 0.1;
 		iPos.y += 0.1;
 		running.moveRight();
 		moving = true;
@@ -393,6 +393,8 @@ void loadMap(string fileName)
 	{
 		cout << "Houve um problema na leitura de " << fileName << endl;
 	}
+	//tileSize.x = tileSize.x / 2;
+	tileSize.y = tileSize.y / 2;
 }
 
 GLuint setupTile()
