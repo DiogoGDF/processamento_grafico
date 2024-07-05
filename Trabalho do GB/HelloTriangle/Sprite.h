@@ -51,7 +51,9 @@ protected:
     int nAnimations, nFrames, iAnimation, iFrame;
     glm::vec2 offsetTex; //ds e dt 
 
-    float lastTime; //pra fazer a sincronização do FPS -- TODO
+    float lastTime; 
+    float FPS;
+
     Shader* shader;
     Shader* shaderDebug;
 

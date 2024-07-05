@@ -1,5 +1,6 @@
 // Aluno: Diogo Garbinato de Fagundes		Matrícula: 1189650
 
+// Importações
 #include <iostream>
 #include <string>
 #include <assert.h>
@@ -8,31 +9,44 @@
 
 using namespace std;
 
+// GLAD e GLFW
 #include <glad/glad.h>
-
 #include <GLFW/glfw3.h>
 
-#include "Shader.h"
-
+// GLM (matemática com opengl)
 #include <glm/glm.hpp> 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+// Trilha sonora
+#include <Windows.h>
+#include <mmsystem.h>
+#include <string>
+#pragma comment(lib, "winmm.lib")
+
+// Biblioteca para carregar imagens
 #include <stb_image.h>
 
+// Classes
 #include "Sprite.h"
-
+#include "Shader.h"
 #include "Timer.h"
 
+// Enum para direções
 enum directions { NONE = -1, LEFT, RIGHT, UP, DOWN };
 
+// Função de callback para teclado
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 
+// Função para carregar textura
 GLuint loadTexture(string filePath, int& imgWidth, int& imgHeight);
+// Função para verificar colisão
 bool CheckCollision(Sprite& one, Sprite& two);
 
+// Dimensões da janela
 const GLuint WIDTH = 800, HEIGHT = 600;
 
+// Variáveis globais
 int dir = NONE;
 
 GLuint tilesetTexID;
@@ -46,38 +60,38 @@ const int MAX_COLUNAS = 15;
 const int MAX_LINHAS = 15;
 int tilemap[MAX_LINHAS][MAX_COLUNAS]; 
 
+// Funções para carregar e desenhar o mapa
 void loadMap(string fileName);
 GLuint setupTile();
 void drawMap(Shader& shader);
 
 glm::vec2 iPos; 
-
 glm::vec2 posIni; 
+Sprite player;
 
 int main()
 {
+	// Trilha sonora
+	PlaySound(TEXT("../../Soundtrack/end_of_line.wav"), NULL, SND_ASYNC | SND_FILENAME | SND_LOOP);
+
 	glfwInit();
 
+	// Versão do OpenGl
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Ola Triangulo! -- Rossana", nullptr, nullptr);
+	// Criação da janela
+	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "CyberCity", nullptr, nullptr);
 	glfwMakeContextCurrent(window);
-
 	glfwSetKeyCallback(window, key_callback);
 
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-	{
+	// Inicialização do GLAD
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		std::cout << "Failed to initialize GLAD" << std::endl;
-
 	}
 
-	const GLubyte* renderer = glGetString(GL_RENDERER); /* get renderer string */
-	const GLubyte* version = glGetString(GL_VERSION); /* version as a string */
-	cout << "Renderer: " << renderer << endl;
-	cout << "OpenGL version supported " << version << endl;
-
+	// Viewport
 	int width, height;
 	glfwGetFramebufferSize(window, &width, &height);
 	glViewport(0, 0, width, height);
@@ -88,14 +102,19 @@ int main()
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_ALWAYS);
 
+	// Compilando shaders
 	Shader shader("../shaders/HelloTriangle.vs", "../shaders/HelloTriangle.fs");
 	Shader shaderDebug("../shaders/HelloTriangle.vs", "../shaders/HelloTriangleDebug.fs");
 
-	int imgWidth, imgHeight;
-	GLuint texID = loadTexture("./knight.png", imgWidth, imgHeight);
+	// ************* Texturas e Sprites *************
 
-	Sprite player, coin, sprite3, background, ground, sprite4;
-	player.inicializar(texID, 1, 1, glm::vec3(400.0, 150.0, 0.0), glm::vec3(imgWidth * 0.5, imgHeight * 0.5, 1.0), 0.0, glm::vec3(1.0, 0.0, 1.0));
+	int imgWidth, imgHeight;
+	//GLuint texID = loadTexture("./knight.png", imgWidth, imgHeight);
+	GLuint texID = loadTexture("../../Textures/characters/PNG/Biker/Biker_idle.png", imgWidth, imgHeight);
+
+	Sprite coin, sprite3, background, ground, sprite4;
+	player.inicializar(texID, 1, 4, glm::vec3(400.0, 60.0, 0.0), glm::vec3(imgWidth * 1.5, imgHeight * 1.5, 1.0), 0.0, glm::vec3(1.0, 0.0, 1.0));
+	//player.inicializar(texID, 1, 1, glm::vec3(400.0, 150.0, 0.0), glm::vec3(imgWidth * 0.5, imgHeight * 0.5, 1.0), 0.0, glm::vec3(1.0, 0.0, 1.0));
 	player.setShader(&shader);
 	player.setShaderDebug(&shaderDebug);
 
@@ -104,24 +123,8 @@ int main()
 	coin.setShader(&shader);
 	coin.setShaderDebug(&shaderDebug);
 
-	//sprite2.inicializar(glm::vec3(200.0,300.0,0.0), glm::vec3(100.0,50.0,1.0));
-	//sprite2.setShader(&shader);
-
-	//sprite3.inicializar(glm::vec3(600.0,300.0,0.0), glm::vec3(50.0,100.0,1.0), 0.0,glm::vec3(0.0,0.5,0.0));
-	//sprite3.setShader(&shader);
-	//GLuint texID2 = loadTexture("../Textures/backgrounds/fantasy-set/PNG/Battleground1/Bright/Battleground1.png", imgWidth, imgHeight);
-
-	//background.inicializar(texID2, 1, 1, glm::vec3(400.0, 300.0, 0.0), glm::vec3(imgWidth / 2, imgHeight / 2, 1.0), 0.0, glm::vec3(0.0, 1.0, 1.0));
 	background.setShader(&shader);
 	background.setShaderDebug(&shaderDebug);
-
-	//ground.inicializar(glm::vec3(400.0,100.0,0.0), glm::vec3(800.0,200.0,1.0),0.0,glm::vec3(0.5,0.5,0.0));
-	//ground.setShader(&shader);
-
-	//sprite4.inicializar(glm::vec3(200.0,500.0,0.0), glm::vec3(100.0,100.0,1.0),45.0,glm::vec3(1.0,1.0,0.0));
-	//sprite4.setShader(&shader);
-
-	//glm::mat4 projection = glm::ortho(-10.0, 10.0, -10.0, 10.0, -1.0, 1.0);
 
 	loadMap("map2.txt");
 	VAOTile = setupTile();
@@ -145,10 +148,7 @@ int main()
 
 	while (!glfwWindowShouldClose(window))
 	{
-		//timer.start();
 		glfwPollEvents();
-
-
 
 		// Limpa o buffer de cor
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f); 
@@ -176,11 +176,13 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	{
 		dir = LEFT;
 		iPos.x -= 1;
+		player.moveLeft();
 	}
 	if (key == GLFW_KEY_D && action == GLFW_PRESS)
 	{
 		dir = RIGHT;
 		iPos.x += 1;
+		player.moveRight();
 	}
 	if (key == GLFW_KEY_W && action == GLFW_PRESS)
 	{
@@ -335,7 +337,6 @@ glm::vec2 calculoPosicaoDesenho(int column, int row, float tileWidth, float tile
 	return glm::vec2(x, y);
 }
 
-// Modificação na função drawMap para usar a calculoPosicaoDesenho
 void drawMap(Shader& shader) {
 	shader.Use();
 

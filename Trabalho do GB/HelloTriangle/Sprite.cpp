@@ -53,6 +53,8 @@ void Sprite::inicializar(GLuint texID, int nAnimations, int nFrames, glm::vec3 p
 	glBindVertexArray(0);
 
 	vel = 2.0;
+	lastTime = 0.0;
+	FPS = 10.0;
 
 	iAnimation = 0;
 	iFrame = 0;
@@ -62,10 +64,33 @@ void Sprite::inicializar(GLuint texID, int nAnimations, int nFrames, glm::vec3 p
 	colidiu = false;
 }
 
+void Sprite::moveLeft()
+{
+	pos.x = pos.x - vel;
+	if (escala.x > 0.0)
+		escala.x = -escala.x;
+
+}
+
+void Sprite::moveRight()
+{
+	pos.x = pos.x + vel;
+	if (escala.x < 0.0)
+		escala.x = -escala.x;
+}
+
 void Sprite::atualizar()
 {
 	shader->Use();
-	//iFrame = (iFrame + 1) % nFrames; //incrementando ciclicamente o indice do Frame
+	// Atualizando a textura de acordo com o FPS para animação
+	float now = glfwGetTime();
+	float dt = now - lastTime;
+	if (dt >= 1 / FPS)
+	{
+		iFrame = (iFrame + 1) % nFrames;
+		lastTime = now;
+	}
+
 
 	//Calculando o quanto teremos que deslocar nas coordenadas de textura
 	float offsetTexFrameS = iFrame * offsetTex.s;
@@ -78,9 +103,9 @@ void Sprite::atualizar()
 	model = glm::scale(model, escala);
 	shader->setMat4("model", glm::value_ptr(model));
 
-	shaderDebug->Use();
-	shaderDebug->setVec2("offsetTex", offsetTexFrameS, offsetTexFrameT);
-	shaderDebug->setMat4("model", glm::value_ptr(model));
+	//shaderDebug->Use();
+	//shaderDebug->setVec2("offsetTex", offsetTexFrameS, offsetTexFrameT);
+	//shaderDebug->setMat4("model", glm::value_ptr(model));
 
 }
 
@@ -105,16 +130,6 @@ void Sprite::desenhar()
 
 	glBindVertexArray(0); //desconectando o buffer de geometria
 
-}
-
-void Sprite::moveLeft()
-{
-	pos.x = pos.x - vel;
-}
-
-void Sprite::moveRight()
-{
-	pos.x = pos.x + vel;
 }
 
 void Sprite::moveItem()
