@@ -82,7 +82,7 @@ int main()
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	// Criação da janela
-	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "CyberCity", nullptr, nullptr);
+	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Jogo", nullptr, nullptr);
 	glfwMakeContextCurrent(window);
 	glfwSetKeyCallback(window, key_callback);
 
