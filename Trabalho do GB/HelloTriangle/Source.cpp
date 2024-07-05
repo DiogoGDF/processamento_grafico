@@ -174,141 +174,67 @@ int main()
 	return 0;
 }
 
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
-{
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode) {
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
 
-	if (key == GLFW_KEY_Q)
-	{
+	glm::vec2 novaPos = iPos;
+
+	if (key == GLFW_KEY_Q) {
+		novaPos.x -= 0.1;
+		novaPos.y -= 0.1;
+	}
+	else if (key == GLFW_KEY_W) {
+		novaPos.y -= 0.1;
+	}
+	else if (key == GLFW_KEY_E) {
+		novaPos.x += 0.1;
+		novaPos.y -= 0.1;
+	}
+	else if (key == GLFW_KEY_D) {
+		novaPos.x += 0.1;
+	}
+	else if (key == GLFW_KEY_A) {
+		novaPos.x -= 0.1;
+	}
+	else if (key == GLFW_KEY_LEFT_SHIFT) {
+		novaPos.x -= 0.1;
+		novaPos.y += 0.1;
+	}
+	else if (key == GLFW_KEY_S) {
+		novaPos.y += 0.1;
+	}
+	else if (key == GLFW_KEY_C) {
+		novaPos.x += 0.1;
+		novaPos.y += 0.1;
+	}
+
+	if (key == GLFW_KEY_Q || key == GLFW_KEY_W || key == GLFW_KEY_A || key == GLFW_KEY_LEFT_SHIFT) {
 		dir = LEFT;
-		iPos.x -= 0.1;
-		iPos.y -= 0.1;
 		running.moveLeft();
 		moving = true;
-		if (action == GLFW_RELEASE)
-		{
-			moving = false;
-			// Trocar o sprite para o de parado (colocando na posição do sprite de corrida)
-			idle.setPosicao(running.getPosicao());
-			idle.moveLeft();
-			dir = NONE;
-		}
 	}
-	else if (key == GLFW_KEY_W)
-	{
-		dir = LEFT;
-		iPos.y -= 0.1;
-		running.moveLeft();
-		moving = true;
-		if (action == GLFW_RELEASE)
-		{
-			moving = false;
-			// Trocar o sprite para o de parado (colocando na posição do sprite de corrida)
-			idle.setPosicao(running.getPosicao());
-			idle.moveLeft();
-			dir = NONE;
-		}
-	}
-	else if (key == GLFW_KEY_E)
-	{
+	else if (key == GLFW_KEY_E || key == GLFW_KEY_D || key == GLFW_KEY_S || key == GLFW_KEY_C) {
 		dir = RIGHT;
-		iPos.x += 0.1;
-		iPos.y -= 0.1;
 		running.moveRight();
 		moving = true;
-		if (action == GLFW_RELEASE)
-		{
-			moving = false;
-			// Trocar o sprite para o de parado (colocando na posição do sprite de corrida)
-			idle.setPosicao(running.getPosicao());
-			idle.moveRight();
-			dir = NONE;
-		}
 	}
-	else if (key == GLFW_KEY_D)
-	{
-		dir = RIGHT;
-		iPos.x += 0.1;
-		running.moveRight();
-		moving = true;
-		if (action == GLFW_RELEASE)
-		{
-			moving = false;
-			// Trocar o sprite para o de parado (colocando na posição do sprite de corrida)
-			idle.setPosicao(running.getPosicao());
-			idle.moveRight();
-			dir = NONE;
-		}
-	}
-	else if (key == GLFW_KEY_A)
-	{
-		dir = LEFT;
-		iPos.x -= 0.1;
-		running.moveLeft();
-		moving = true;
-		if (action == GLFW_RELEASE)
-		{
-			moving = false;
-			// Trocar o sprite para o de parado (colocando na posição do sprite de corrida)
-			idle.setPosicao(running.getPosicao());
+
+	if (action == GLFW_RELEASE) {
+		moving = false;
+		idle.setPosicao(running.getPosicao());
+		if (dir == LEFT) {
 			idle.moveLeft();
-			dir = NONE;
 		}
-	}
-	else if (key == GLFW_KEY_LEFT_SHIFT)
-	{
-		dir = LEFT;
-		iPos.x -= 0.1;
-		iPos.y += 0.1;
-		running.moveLeft();
-		moving = true;
-		if (action == GLFW_RELEASE)
-		{
-			moving = false;
-			// Trocar o sprite para o de parado (colocando na posição do sprite de corrida)
-			idle.setPosicao(running.getPosicao());
-			idle.moveLeft();
-			dir = NONE;
-		}
-	}
-	else if (key == GLFW_KEY_S)
-	{
-		dir = RIGHT;
-		iPos.y += 0.1;
-		running.moveRight();
-		moving = true;
-		if (action == GLFW_RELEASE)
-		{
-			moving = false;
-			// Trocar o sprite para o de parado (colocando na posição do sprite de corrida)
-			idle.setPosicao(running.getPosicao());
+		else if (dir == RIGHT) {
 			idle.moveRight();
-			dir = NONE;
 		}
-	}
-	else if (key == GLFW_KEY_C)
-	{
-		dir = RIGHT;
-		iPos.x += 0.1;
-		iPos.y += 0.1;
-		running.moveRight();
-		moving = true;
-		if (action == GLFW_RELEASE)
-		{
-			moving = false;
-			// Trocar o sprite para o de parado (colocando na posição do sprite de corrida)
-			idle.setPosicao(running.getPosicao());
-			idle.moveRight();
-			dir = NONE;
-		}
-	}
-	else
-	{
 		dir = NONE;
 	}
 
+	iPos = novaPos;
 }
+
 
 GLuint loadTexture(string filePath, int& imgWidth, int& imgHeight)
 {
