@@ -29,6 +29,7 @@ public:
     inline void setAngulo(float angulo) { this->angulo = angulo; }
 
     inline void setPosicao(glm::vec3 novaPos) { this->pos = novaPos; }
+    glm::vec3 getPosicao() { return this->pos; }
 
     inline glm::vec3 getPMin() { return this->pmin; }
     inline glm::vec3 getPMax() { return this->pmax; }

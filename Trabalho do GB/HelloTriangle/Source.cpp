@@ -30,7 +30,6 @@ using namespace std;
 // Classes
 #include "Sprite.h"
 #include "Shader.h"
-#include "Timer.h"
 
 // Enum para direções
 enum directions { NONE = -1, LEFT, RIGHT, UP, DOWN };
@@ -67,7 +66,8 @@ void drawMap(Shader& shader);
 
 glm::vec2 iPos; 
 glm::vec2 posIni; 
-Sprite player;
+Sprite idle, running;
+bool moving = false;
 
 int main()
 {
@@ -107,24 +107,23 @@ int main()
 	Shader shaderDebug("../shaders/HelloTriangle.vs", "../shaders/HelloTriangleDebug.fs");
 
 	// ************* Texturas e Sprites *************
-
 	int imgWidth, imgHeight;
-	//GLuint texID = loadTexture("./knight.png", imgWidth, imgHeight);
-	GLuint texID = loadTexture("../../Textures/characters/PNG/Biker/Biker_idle.png", imgWidth, imgHeight);
-
 	Sprite coin, sprite3, background, ground, sprite4;
-	player.inicializar(texID, 1, 4, glm::vec3(400.0, 60.0, 0.0), glm::vec3(imgWidth * 1.5, imgHeight * 1.5, 1.0), 0.0, glm::vec3(1.0, 0.0, 1.0));
-	//player.inicializar(texID, 1, 1, glm::vec3(400.0, 150.0, 0.0), glm::vec3(imgWidth * 0.5, imgHeight * 0.5, 1.0), 0.0, glm::vec3(1.0, 0.0, 1.0));
-	player.setShader(&shader);
-	player.setShaderDebug(&shaderDebug);
 
-	//texID = loadTexture("../Textures/items/Pirate-Stuff/Icon31.png", imgWidth, imgHeight);
+	GLuint texID = loadTexture("../../Textures/characters/PNG/Biker/Biker_idle.png", imgWidth, imgHeight);
+	idle.inicializar(texID, 1, 4, glm::vec3(400.0, 60.0, 0.0), glm::vec3(imgWidth, imgHeight, 1.0), 0.0, glm::vec3(1.0, 0.0, 1.0));
+	idle.setShader(&shader);
+	idle.setShaderDebug(&shaderDebug);
+
+	texID = loadTexture("../../Textures/characters/PNG/Biker/Biker_run.png", imgWidth, imgHeight);
+	running.inicializar(texID, 1, 6, glm::vec3(400.0, 60.0, 0.0), glm::vec3(imgWidth, imgHeight, 1.0), 0.0, glm::vec3(1.0, 0.0, 1.0));
+	running.setShader(&shader);
+	running.setShaderDebug(&shaderDebug);
+
+	texID = loadTexture("../Textures/items/Pirate-Stuff/Icon31.png", imgWidth, imgHeight);
 	coin.inicializar(texID, 1, 1, glm::vec3(450.0, 700.0, 0.0), glm::vec3(imgWidth * 2, imgHeight * 2, 1.0), 0.0, glm::vec3(1.0, 0.0, 1.0));
 	coin.setShader(&shader);
 	coin.setShaderDebug(&shaderDebug);
-
-	background.setShader(&shader);
-	background.setShaderDebug(&shaderDebug);
 
 	loadMap("map2.txt");
 	VAOTile = setupTile();
@@ -157,8 +156,16 @@ int main()
 		drawMap(shader);
 		float x = posIni.x + iPos.x * tileSize.x;
 		float y = posIni.y + iPos.y * tileSize.y;
-		player.setPosicao(glm::vec3(x, y, 0.0)); 
-		player.desenhar();
+		if (moving)
+		{
+			running.setPosicao(glm::vec3(x, y, 0.0));
+			running.desenhar();
+		}
+		else
+		{
+			idle.setPosicao(glm::vec3(x, y, 0.0));
+			idle.desenhar();
+		}
 
 		glfwSwapBuffers(window);
 	}
@@ -172,30 +179,131 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
 
-	if (key == GLFW_KEY_A && action == GLFW_PRESS)
+	if (key == GLFW_KEY_Q)
 	{
 		dir = LEFT;
-		iPos.x -= 1;
-		player.moveLeft();
+		iPos.x -= 0.1;
+		iPos.y -= 0.1;
+		running.moveLeft();
+		moving = true;
+		if (action == GLFW_RELEASE)
+		{
+			moving = false;
+			// Trocar o sprite para o de parado (colocando na posição do sprite de corrida)
+			idle.setPosicao(running.getPosicao());
+			idle.moveLeft();
+			dir = NONE;
+		}
 	}
-	if (key == GLFW_KEY_D && action == GLFW_PRESS)
+	else if (key == GLFW_KEY_E)
 	{
 		dir = RIGHT;
-		iPos.x += 1;
-		player.moveRight();
+		iPos.x += 0.1;
+		iPos.y -= 0.1;
+		running.moveRight();
+		moving = true;
+		if (action == GLFW_RELEASE)
+		{
+			moving = false;
+			// Trocar o sprite para o de parado (colocando na posição do sprite de corrida)
+			idle.setPosicao(running.getPosicao());
+			idle.moveRight();
+			dir = NONE;
+		}
 	}
-	if (key == GLFW_KEY_W && action == GLFW_PRESS)
+	else if (key == GLFW_KEY_Z)
 	{
 		dir = LEFT;
-		iPos.y -= 1;
+		iPos.x -= 0.1;
+		iPos.y += 0.1;
+		running.moveLeft();
+		moving = true;
+		if (action == GLFW_RELEASE)
+		{
+			moving = false;
+			// Trocar o sprite para o de parado (colocando na posição do sprite de corrida)
+			idle.setPosicao(running.getPosicao());
+			idle.moveLeft();
+			dir = NONE;
+		}
 	}
-	if (key == GLFW_KEY_S && action == GLFW_PRESS)
+	else if (key == GLFW_KEY_C)
 	{
 		dir = RIGHT;
-		iPos.y += 1;
+		iPos.x += 0.1;
+		iPos.y += 0.1;
+		running.moveRight();
+		moving = true;
+		if (action == GLFW_RELEASE)
+		{
+			moving = false;
+			// Trocar o sprite para o de parado (colocando na posição do sprite de corrida)
+			idle.setPosicao(running.getPosicao());
+			idle.moveRight();
+			dir = NONE;
+		}
 	}
-
-	if (action == GLFW_RELEASE)
+	else if (key == GLFW_KEY_A)
+	{
+		dir = LEFT;
+		iPos.x -= 0.1;
+		running.moveLeft();
+		moving = true;
+		if (action == GLFW_RELEASE)
+		{
+			moving = false;
+			// Trocar o sprite para o de parado (colocando na posição do sprite de corrida)
+			idle.setPosicao(running.getPosicao());
+			idle.moveLeft();
+			dir = NONE;
+		}
+	}
+	else if (key == GLFW_KEY_D)
+	{
+		dir = RIGHT;
+		iPos.x += 0.1;
+		running.moveRight();
+		moving = true;
+		if (action == GLFW_RELEASE)
+		{
+			moving = false;
+			// Trocar o sprite para o de parado (colocando na posição do sprite de corrida)
+			idle.setPosicao(running.getPosicao());
+			idle.moveRight();
+			dir = NONE;
+		}
+	}
+	else if (key == GLFW_KEY_W)
+	{
+		dir = LEFT;
+		iPos.y -= 0.1;
+		running.moveLeft();
+		moving = true;
+		if (action == GLFW_RELEASE)
+		{
+			moving = false;
+			// Trocar o sprite para o de parado (colocando na posição do sprite de corrida)
+			idle.setPosicao(running.getPosicao());
+			idle.moveLeft();
+			dir = NONE;
+		}
+	}
+	else if (key == GLFW_KEY_S)
+	{
+		dir = RIGHT;
+		iPos.y += 0.1;
+		running.moveRight();
+		moving = true;
+		if (action == GLFW_RELEASE)
+		{
+			moving = false;
+			// Trocar o sprite para o de parado (colocando na posição do sprite de corrida)
+			idle.setPosicao(running.getPosicao());
+			idle.moveRight();
+			dir = NONE;
+		}
+	}
+	else
 	{
 		dir = NONE;
 	}
@@ -260,7 +368,7 @@ bool CheckCollision(Sprite& one, Sprite& two)
 void loadMap(string fileName)
 {
 	ifstream arqEntrada;
-	arqEntrada.open(fileName); 
+	arqEntrada.open(fileName);
 	if (arqEntrada)
 	{
 		string textureName;
@@ -268,11 +376,11 @@ void loadMap(string fileName)
 		arqEntrada >> textureName >> nTiles >> tileSize.y >> tileSize.x;
 		tilesetTexID = loadTexture(textureName, width, height);
 		cout << textureName << " " << nTiles << " " << tileSize.y << " " << tileSize.x << endl;
-		arqEntrada >> tilemapSize.y >> tilemapSize.x; 
+		arqEntrada >> tilemapSize.y >> tilemapSize.x;
 		cout << tilemapSize.y << " " << tilemapSize.x << endl;
 		for (int i = 0; i < tilemapSize.y; i++)
 		{
-			for (int j = 0; j < tilemapSize.x; j++) 
+			for (int j = 0; j < tilemapSize.x; j++)
 			{
 				arqEntrada >> tilemap[i][j];
 				cout << tilemap[i][j] << " ";
