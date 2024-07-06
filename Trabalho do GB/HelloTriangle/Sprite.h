@@ -11,7 +11,8 @@
 class Sprite
 {
 public:
-    Sprite() {} //Método construtor padrão
+    //Sprite() {} //Método construtor padrão
+    Sprite() : ativo(true) {}
     ~Sprite(); //Método destrutor
 
     void inicializar(GLuint texID, int nAnimations = 1, int nFrames = 1, glm::vec3 pos = glm::vec3(0), glm::vec3 escala = glm::vec3(1), float angulo = 0.0, glm::vec3 cor = glm::vec3(1.0, 0.0, 1.0));
@@ -37,6 +38,7 @@ public:
     void setColisao() { colidiu = true; }
 
     void getAABB();
+    bool ativo; 
 
 protected:
 

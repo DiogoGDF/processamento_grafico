@@ -6,6 +6,7 @@
 #include <assert.h>
 #include <windows.h>  
 #include <fstream>
+#include <vector>
 
 using namespace std;
 
@@ -71,6 +72,7 @@ glm::vec2 iPos;
 glm::vec2 posIni; 
 Sprite idle, running;
 bool moving = false;
+int score = 0;
 
 int main()
 {
@@ -111,7 +113,7 @@ int main()
 
 	// ************* Texturas e Sprites *************
 	int imgWidth, imgHeight;
-	Sprite coin, sprite3, background, ground, sprite4;
+	Sprite chip1, chip2, chip3;
 
 	GLuint texID = loadTexture("../../Textures/characters/PNG/Biker/Biker_idle.png", imgWidth, imgHeight);
 	idle.inicializar(texID, 1, 4, glm::vec3(400.0, 60.0, 0.0), glm::vec3(imgWidth, imgHeight, 1.0), 0.0, glm::vec3(1.0, 0.0, 1.0));
@@ -123,10 +125,18 @@ int main()
 	running.setShader(&shader);
 	running.setShaderDebug(&shaderDebug);
 
-	texID = loadTexture("../Textures/items/Pirate-Stuff/Icon31.png", imgWidth, imgHeight);
-	coin.inicializar(texID, 1, 1, glm::vec3(450.0, 700.0, 0.0), glm::vec3(imgWidth * 2, imgHeight * 2, 1.0), 0.0, glm::vec3(1.0, 0.0, 1.0));
-	coin.setShader(&shader);
-	coin.setShaderDebug(&shaderDebug);
+	texID = loadTexture("../../Textures/items/Cyberpunk/microchip.png", imgWidth, imgHeight);
+	chip1.inicializar(texID, 1, 1, glm::vec3(400.0, 90.0, 0.0), glm::vec3(imgWidth / 2, imgHeight / 2, 1.0), 0.0, glm::vec3(1.0, 0.0, 1.0));
+	chip1.setShader(&shader);
+	chip1.setShaderDebug(&shaderDebug);
+
+	chip2.inicializar(texID, 1, 1, glm::vec3(200.0, 220.0, 0.0), glm::vec3(imgWidth / 2, imgHeight / 2, 1.0), 0.0, glm::vec3(1.0, 0.0, 1.0));
+	chip2.setShader(&shader);
+	chip2.setShaderDebug(&shaderDebug);
+
+	chip3.inicializar(texID, 1, 1, glm::vec3(600.0, 220.0, 0.0), glm::vec3(imgWidth / 2, imgHeight / 2, 1.0), 0.0, glm::vec3(1.0, 0.0, 1.0));
+	chip3.setShader(&shader);
+	chip3.setShaderDebug(&shaderDebug);
 
 	loadMap("map.txt");
 	VAOTile = setupTile();
@@ -159,6 +169,21 @@ int main()
 		drawMap(shader);
 		float x = posIni.x + iPos.x * tileSize.x;
 		float y = posIni.y + iPos.y * tileSize.y;
+		std::vector<Sprite*> chips = { &chip1, &chip2, &chip3 };
+		for (auto& chip : chips) {
+			if (CheckCollision(idle, *chip) && chip->ativo) {
+				chip->ativo = false; // Marca o chip como coletado
+				score++; // Incrementa a pontuação, assumindo que você queira rastrear isso
+			}
+		}
+		
+		// Desenha apenas os chips ativos
+		for (auto& chip : chips) {
+			if (chip->ativo) {
+				chip->desenhar();
+			}
+		}
+
 		if (moving)
 		{
 			running.setPosicao(glm::vec3(x, y, 0.0));
@@ -169,7 +194,6 @@ int main()
 			idle.setPosicao(glm::vec3(x, y, 0.0));
 			idle.desenhar();
 		}
-
 		glfwSwapBuffers(window);
 	}
 
@@ -303,15 +327,16 @@ GLuint loadTexture(string filePath, int& imgWidth, int& imgHeight)
 	return texID;
 }
 
-bool CheckCollision(Sprite& one, Sprite& two)
-{
-	// collision x-axis?
-	bool collisionX = one.getPMax().x >= two.getPMin().x &&
-		two.getPMax().x >= one.getPMin().x;
-	// collision y-axis?
-	bool collisionY = one.getPMax().y >= two.getPMin().y &&
-		two.getPMax().y >= one.getPMin().y;
-	// collision only if on both axes
+bool CheckCollision(Sprite& one, Sprite& two) {
+	// Calcula AABBs para ambos os sprites
+	one.getAABB();
+	two.getAABB();
+
+	// Verifica se há sobreposição nos eixos x e y
+	bool collisionX = one.getPMax().x >= two.getPMin().x && two.getPMax().x >= one.getPMin().x;
+	bool collisionY = one.getPMax().y >= two.getPMin().y && two.getPMax().y >= one.getPMin().y;
+
+	// Se houver sobreposição em ambos os eixos, há uma colisão
 	return collisionX && collisionY;
 }
 
