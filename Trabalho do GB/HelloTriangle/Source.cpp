@@ -119,13 +119,13 @@ int main()
 
 	// Personagem parado
 	GLuint texID = loadTexture("../../Textures/characters/PNG/Biker/Biker_idle.png", imgWidth, imgHeight);
-	idle.inicializar(texID, 1, 4, glm::vec3(400.0, 60.0, 0.0), glm::vec3(imgWidth, imgHeight, 1.0), 0.0, glm::vec3(1.0, 0.0, 1.0));
+	idle.inicializar(texID, 1, 4, glm::vec3(350.0, 60.0, 0.0), glm::vec3(imgWidth, imgHeight, 1.0), 0.0, glm::vec3(1.0, 0.0, 1.0));
 	idle.setShader(&shader);
 	idle.setShaderDebug(&shaderDebug);
 
 	// Personagem correndo
 	texID = loadTexture("../../Textures/characters/PNG/Biker/Biker_run.png", imgWidth, imgHeight);
-	running.inicializar(texID, 1, 6, glm::vec3(400.0, 60.0, 0.0), glm::vec3(imgWidth, imgHeight, 1.0), 0.0, glm::vec3(1.0, 0.0, 1.0));
+	running.inicializar(texID, 1, 6, glm::vec3(350.0, 60.0, 0.0), glm::vec3(imgWidth, imgHeight, 1.0), 0.0, glm::vec3(1.0, 0.0, 1.0));
 	running.setShader(&shader);
 	running.setShaderDebug(&shaderDebug);
 
