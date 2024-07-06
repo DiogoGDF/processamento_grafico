@@ -42,6 +42,9 @@ GLuint loadTexture(string filePath, int& imgWidth, int& imgHeight);
 // Função para verificar colisão
 bool CheckCollision(Sprite& one, Sprite& two);
 
+glm::vec2 calculoPosicaoDesenho(int column, int row, float tileWidth, float tileHeight);
+glm::vec2 calcularPosicaoTile(glm::vec2 posInicial, glm::vec2 posDesenho, glm::vec2 tileSize, float rotacao);
+
 // Dimensões da janela
 const GLuint WIDTH = 1200, HEIGHT = 1000;
 
@@ -179,7 +182,9 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		glfwSetWindowShouldClose(window, GL_TRUE);
 
 	glm::vec2 novaPos = iPos;
+	bool podeMover = true;
 
+	// Movimentação básica
 	if (key == GLFW_KEY_Q) {
 		novaPos.x -= 0.1;
 		novaPos.y -= 0.1;
@@ -209,32 +214,51 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		novaPos.y += 0.1;
 	}
 
-	if (key == GLFW_KEY_Q || key == GLFW_KEY_W || key == GLFW_KEY_A || key == GLFW_KEY_LEFT_SHIFT) {
-		dir = LEFT;
-		running.moveLeft();
-		moving = true;
-	}
-	else if (key == GLFW_KEY_E || key == GLFW_KEY_D || key == GLFW_KEY_S || key == GLFW_KEY_C) {
-		dir = RIGHT;
-		running.moveRight();
-		moving = true;
+	// Verificação de colisão com tiles de gelo (número 4)
+	for (int i = 0; i < tilemapSize.y; i++) {
+		for (int j = 0; j < tilemapSize.x; j++) {
+			if (tilemap[i][j] == 4) {
+				glm::vec2 posDesenho = calculoPosicaoDesenho(j, i, tileSize.x, tileSize.y);
+				glm::vec2 posTile = calcularPosicaoTile(posIni, posDesenho, tileSize, 0.0f);
+
+				// Verifica se a nova posição do jogador colide com o tile de gelo
+				if (novaPos.x > posTile.x - tileSize.x / 2 && novaPos.x < posTile.x + tileSize.x / 2 &&
+					novaPos.y > posTile.y - tileSize.y / 2 && novaPos.y < posTile.y + tileSize.y / 2) {
+					podeMover = false;
+					break;
+				}
+			}
+		}
+		if (!podeMover) break;
 	}
 
-	if (action == GLFW_RELEASE) {
-		moving = false;
-		idle.setPosicao(running.getPosicao());
-		if (dir == LEFT) {
-			idle.moveLeft();
+	if (podeMover) {
+		if (key == GLFW_KEY_Q || key == GLFW_KEY_W || key == GLFW_KEY_A || key == GLFW_KEY_LEFT_SHIFT) {
+			dir = LEFT;
+			running.moveLeft();
+			moving = true;
 		}
-		else if (dir == RIGHT) {
-			idle.moveRight();
+		else if (key == GLFW_KEY_E || key == GLFW_KEY_D || key == GLFW_KEY_S || key == GLFW_KEY_C) {
+			dir = RIGHT;
+			running.moveRight();
+			moving = true;
 		}
-		dir = NONE;
-	}
 
-	iPos = novaPos;
+		if (action == GLFW_RELEASE) {
+			moving = false;
+			idle.setPosicao(running.getPosicao());
+			if (dir == LEFT) {
+				idle.moveLeft();
+			}
+			else if (dir == RIGHT) {
+				idle.moveRight();
+			}
+			dir = NONE;
+		}
+
+		iPos = novaPos;
+	}
 }
-
 
 GLuint loadTexture(string filePath, int& imgWidth, int& imgHeight)
 {
@@ -373,6 +397,18 @@ glm::vec2 calculoPosicaoDesenho(int column, int row, float tileWidth, float tile
 	return glm::vec2(x, y);
 }
 
+glm::vec2 calcularPosicaoTile(glm::vec2 posInicial, glm::vec2 posDesenho, glm::vec2 tileSize, float rotacao) {
+	glm::mat4 model = glm::mat4(1);
+	model = glm::translate(model, glm::vec3(posInicial.x + posDesenho.x, posInicial.y + posDesenho.y, 0.0));
+	model = glm::scale(model, glm::vec3(tileSize.x, tileSize.y, 1.0));
+	model = glm::rotate(model, glm::radians(rotacao), glm::vec3(0.0, 0.0, 1.0));
+
+	glm::vec4 originalPosition = glm::vec4(0.0, 0.0, 0.0, 1.0); // posição do centro do tile
+	glm::vec4 transformedPosition = model * originalPosition;
+
+	return glm::vec2(transformedPosition.x, transformedPosition.y);
+}
+
 void drawMap(Shader& shader) {
 	shader.Use();
 
@@ -383,8 +419,11 @@ void drawMap(Shader& shader) {
 		for (int j = 0; j < tilemapSize.x; j++) {
 			glm::vec2 posDesenho = calculoPosicaoDesenho(j, i, tileSize.x, tileSize.y);
 
+			glm::vec2 posTile = calcularPosicaoTile(posIni, posDesenho, tileSize, 45.0f);
+			// Agora você tem a posição transformada do tile em posTile
+
 			glm::mat4 model = glm::mat4(1);
-			model = glm::translate(model, glm::vec3(posIni.x + posDesenho.x, posIni.y + posDesenho.y, 0.0));
+			model = glm::translate(model, glm::vec3(posTile.x, posTile.y, 0.0));
 			model = glm::scale(model, glm::vec3(tileSize.x, tileSize.y, 1.0));
 			model = glm::rotate(model, glm::radians(45.0f), glm::vec3(0.0, 0.0, 1.0));
 
@@ -399,3 +438,4 @@ void drawMap(Shader& shader) {
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glBindVertexArray(0);
 }
+
